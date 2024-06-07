@@ -1,0 +1,109 @@
+requirements
+0. load the data
+1. Impute a categorical missing value
+2. Impute a numerical missing value
+3. Identify a scaling problem visually
+4. Apply 2 methods of scaling to treat outliers
+5. Convert a categorical variable to number(s)
+6. Fit a classification model
+7. Discuss confusion matrix
+8.Discuss accuracy metric
+
+
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import confusion_matrix, accuracy_score
+
+data_classification = pd.read_csv('heart.csv')
+
+print(data_classification.head())
+
+data_classification.isnull().sum().sum
+
+X_classification = data_classification[['Age', 'Sex', 'ChestPainType', 'RestingBP', 'Cholesterol', 'FastingBS', 'RestingECG', 'MaxHR', 'ExerciseAngina', 'Oldpeak', 'ST_Slope']]
+y_classification = data_classification['HeartDisease']
+
+X_classification = pd.get_dummies(X_classification, columns=['RestingECG', 'ST_Slope', 'Sex'], drop_first=True)
+
+chest_pain_dummies = pd.get_dummies(X_classification['ChestPainType'], prefix='ChestPain')
+X_classification = pd.concat([X_classification, chest_pain_dummies], axis=1)
+X_classification.drop('ChestPainType', axis=1, inplace=True)
+
+X_classification['FastingBS'] = (X_classification['FastingBS'] == 'Y').astype(int)
+
+X_classification['ExerciseAngina'] = (X_classification['ExerciseAngina'] == 'Y').astype(int)
+
+X_classification.fillna(X_classification.mean(), inplace=True)
+
+X_train_classification, X_test_classification, y_train_classification, y_test_classification = train_test_split(X_classification, y_classification, test_size=0.2, random_state=42)
+
+knn_model = KNeighborsClassifier()
+knn_model.fit(X_train_classification, y_train_classification)
+
+y_pred_classification = knn_model.predict(X_test_classification)
+
+conf_matrix = confusion_matrix(y_test_classification, y_pred_classification)
+accuracy = accuracy_score(y_test_classification, y_pred_classification)
+
+print(f'Confusion Matrix:\n{conf_matrix}')
+print(f'Accuracy: {accuracy}')
+
+plt.figure(figsize=(8, 6))
+sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', cbar=False)
+plt.xlabel('Predicted Labels')
+plt.ylabel('True Labels')
+plt.title('Confusion Matrix for KNN Classification')
+plt.show().
+
+
+and this is a smaple of my dateset.
+
+Age,Sex,ChestPainType,RestingBP,Cholesterol,FastingBS,RestingECG,MaxHR,ExerciseAngina,Oldpeak,ST_Slope,HeartDisease.
+
+40,M,ATA,140,289,0,Normal,172,N,0,Up,0
+49,F,NAP,160,180,0,Normal,156,N,1,Flat,1
+37,M,ATA,130,283,0,ST,98,N,0,Up,0
+48,F,ASY,138,214,0,Normal,108,Y,1.5,Flat,1
+54,M,NAP,150,,0,Normal,122,N,0,Up,0
+39,M,NAP,120,339,0,Normal,170,N,0,Up,0
+45,F,ATA,130,237,0,Normal,170,N,0,Up,0
+54,M,ATA,110,208,0,Normal,142,N,0,Up,0
+37,M,ASY,140,207,0,Normal,130,Y,1.5,Flat,1
+48,F,ATA,120,284,0,Normal,120,N,0,Up,0
+37,F,NAP,130,211,0,Normal,142,N,0,Up,0
+58,M,ATA,136,164,0,ST,99,Y,2,Flat,1
+39,M,ATA,120,204,0,Normal,145,N,0,Up,0
+49,M,ASY,140,234,0,Normal,140,Y,1,Flat,1
+42,F,NAP,115,211,0,ST,137,N,0,Up,0
+54,F,ATA,120,273,0,Normal,150,N,1.5,Flat,0
+38,M,ASY,110,196,0,Normal,166,N,0,Flat,1
+43,F,ATA,120,201,0,Normal,165,N,0,Up,0
+60,M,ASY,100,248,0,Normal,125,N,1,Flat,1
+36,M,ATA,120,267,0,Normal,,N,3,Flat,1
+43,F,TA,100,223,0,Normal,142,N,0,Up,0
+44,M,ATA,120,184,0,Normal,142,N,1,Flat,0
+49,F,ATA,124,201,0,Normal,164,N,0,Up,0
+44,M,ATA,150,288,0,Normal,150,Y,3,Flat,1
+40,M,NAP,130,215,0,Normal,138,N,0,Up,0
+36,M,NAP,130,209,0,Normal,178,N,0,Up,0
+53,M,ASY,124,260,0,ST,112,Y,3,Flat,0
+52,M,ATA,120,284,0,Normal,118,N,0,Up,0
+53,F,ATA,113,468,0,Normal,127,N,0,Up,0
+51,M,ATA,125,188,0,Normal,145,N,0,Up,0
+53,M,NAP,145,518,0,Normal,130,N,0,Flat,1
+56,M,NAP,130,167,0,Normal,114,N,0,Up,0
+54,M,ASY,125,224,0,Normal,122,N,2,Flat,1
+41,M,ASY,130,172,0,ST,130,N,2,Flat,1
+43,F,ATA,150,186,0,Normal,154,N,0,Up,0
+32,M,ATA,125,254,0,Normal,155,N,0,Up,0
+65,M,ASY,140,306,1,Normal,87,Y,1.5,Flat,1
+41,F,ATA,110,250,0,ST,142,N,0,Up,0
+48,F,ATA,120,177,1,ST,148,N,0,Up,0
+
+
+
+iam using jupyter
+
